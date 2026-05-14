@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hantavirüs Teşhis Analizi</title>
+    <style>
+        body { 
+            /* Karartma oranını 0.7'den 0.2'ye düşürdüm (Daha aydınlık) */
+            background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), 
+                              url('/static/arka-plan.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-color: #f0f2f5; 
+            
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container { 
+            max-width: 500px; 
+            width: 100%;
+            /* Container şeffaflığını biraz artırdım ki arkadaki resimle bütünleşsin */
+            background: rgba(255, 255, 255, 0.92); 
+            padding: 40px; 
+            border-radius: 20px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2); 
+        }
+
+        h2 { 
+            color: #d32f2f; 
+            text-align: center; 
+            margin-bottom: 30px; 
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .input-group { margin-bottom: 20px; }
+        
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
+
+        input[type="number"], select { 
+            width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; 
+            box-sizing: border-box; font-size: 15px;
+        }
+
+        .symptoms-grid { 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; 
+            background: #f9f9f9; padding: 15px; border-radius: 10px; border: 1px solid #eee;
+        }
+
+        .symptom-item { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #444; }
+
+        button { 
+            width: 100%; background: #d32f2f; color: white; padding: 16px; border: none; 
+            border-radius: 10px; margin-top: 25px; cursor: pointer; font-size: 17px; 
+            font-weight: bold; transition: 0.3s;
+        }
+
+        button:hover { background: #b71c1c; transform: scale(1.02); }
+
+        .result-box { 
+            margin-top: 30px; padding: 20px; border-radius: 12px; text-align: center; 
+            font-size: 19px; font-weight: bold;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .positive { background-color: #ffebee; color: #c62828; border: 2px solid #ef9a9a; }
+        .negative { background-color: #e8f5e9; color: #2e7d32; border: 2px solid #a5d6a7; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Hantavirüs Analizi</h2>
+        <form action="/predict" method="post">
+            <div class="input-group">
+                <label>Hasta Yaşı:</label>
+                <input type="number" name="Age" placeholder="Örn: 35" required min="1">
+            </div>
+            
+            <div class="input-group">
+                <label>Cinsiyet:</label>
+                <select name="Gender" required>
+                    <option value="" disabled selected>Seçiniz...</option>
+                    <option value="M">Erkek</option>
+                    <option value="F">Kadın</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Mevcut Belirtiler:</label>
+                <div class="symptoms-grid">
+                    <div class="symptom-item"><input type="checkbox" name="symptoms" value="Fever"> Ateş</div>
+                    <div class="symptom-item"><input type="checkbox" name="symptoms" value="Muscle Aches"> Kas Ağrısı</div>
+                    <div class="symptom-item"><input type="checkbox" name="symptoms" value="Fatigue"> Halsizlik</div>
+                    <div class="symptom-item"><input type="checkbox" name="symptoms" value="Headache"> Baş Ağrısı</div>
+                    <div class="symptom-item"><input type="checkbox" name="symptoms" value="Nausea"> Mide Bulantısı</div>
+                    <div class="symptom-item"><input type="checkbox" name="symptoms" value="Abdominal Pain"> Karın Ağrısı</div>
+                    <div class="symptom-item"><input type="checkbox" name="symptoms" value="Cough"> Öksürük</div>
+                    <div class="symptom-item"><input type="checkbox" name="symptoms" value="Breath"> Nefes Darlığı</div>
+                </div>
+            </div>
+
+            <button type="submit">Analizi Başlat</button>
+        </form>
+
+        {% if prediction_text %}
+            <div class="result-box {% if 'POZİTİF' in prediction_text %}positive{% else %}negative{% endif %}">
+                {{ prediction_text }}
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
